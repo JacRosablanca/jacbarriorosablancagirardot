@@ -128,7 +128,14 @@ export default function Nav() {
                 },
             ]
         },
-        { href: "/tesoreria", text: "Tesorería" },
+        {
+            text: "Tesorería",
+            href: "/tesoreria",
+            dropdown: [
+                // Aquí está el nuevo enlace a la página de donaciones
+                { href: "/tesoreria/donaciones", text: "Donaciones" },
+            ]
+        },
         { href: "/secretaria", text: "Secretaría" },
         {
             text: "Fiscal",
