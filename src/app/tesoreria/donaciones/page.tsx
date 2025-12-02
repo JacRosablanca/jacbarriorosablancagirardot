@@ -51,16 +51,24 @@ const DonationPage = () => {
       return;
     }
 
-    // Redirección a la app correspondiente usando deep links
-    if (paymentMethod === 'nequi') {
-      // Esto intentará abrir la aplicación Nequi en el dispositivo del usuario.
-      window.location.href = 'nequi://';
-    } else if (paymentMethod === 'daviplata') {
-      // Esto intentará abrir la aplicación Daviplata.
-      window.location.href = 'daviplata://';
+    // Detectar si es un dispositivo móvil
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (paymentMethod === 'nequi' || paymentMethod === 'daviplata') {
+      if (isMobile) {
+        // Si es móvil, intenta abrir la app correspondiente
+        const url = paymentMethod === 'nequi' ? 'nequi://' : 'daviplata://';
+        window.location.href = url;
+      } else {
+        // Si es escritorio, muestra una alerta
+        const appName = paymentMethod === 'nequi' ? 'Nequi' : 'Daviplata';
+        alert(`Estás en un computador. Por favor, abre la aplicación ${appName} en tu celular para completar la donación.`);
+        // Detenemos la ejecución para no continuar
+        return;
+      }
     }
 
-    console.log(`Iniciando donación de $${amount} para "${selectedActivity}" con ${paymentMethod}. Número: ${phoneNumber || 'N/A'}. La clave NO se debe guardar.`);
+    console.log(`Intento de donación de $${amount} para "${selectedActivity}" con ${paymentMethod}. Número: ${phoneNumber || 'N/A'}. La clave NO se debe guardar.`);
     // Aquí iría la lógica para registrar la intención de donación en tu backend.
   };
 
