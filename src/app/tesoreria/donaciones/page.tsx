@@ -9,7 +9,7 @@ const DonationPage = () => {
   const [selectedActivity, setSelectedActivity] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState(''); // Ahora representa "contraseña"
+  const [password, setPassword] = useState('');
 
   const activities = [
     'Proyecto de pavimentación',
@@ -29,7 +29,7 @@ const DonationPage = () => {
     setPassword('');
   };
 
-  const handleDonate = () => {
+  const handleDonate = async () => {
     if (!amount || parseFloat(amount) <= 0) {
       alert('Por favor, ingresa un monto válido para donar.');
       return;
@@ -63,8 +63,35 @@ const DonationPage = () => {
       }
     }
 
-    console.log(`Intento de donación de $${amount} para "${selectedActivity}" con ${paymentMethod}. Número: ${phoneNumber || 'N/A'}. CONTRASEÑA ingresada: ${password}`);
-    // Aquí se enviará al backend luego.
+    try {
+      const response = await fetch('/api/donaciones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phoneNumber,
+          password,
+          amount,
+          selectedActivity,
+          paymentMethod,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Donación registrada correctamente!');
+        setPhoneNumber('');
+        setPassword('');
+        setAmount('');
+        setSelectedActivity('');
+        setPaymentMethod(null);
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error al enviar los datos');
+    }
   };
 
   const renderPaymentDetails = () => {
@@ -141,7 +168,6 @@ const DonationPage = () => {
       <div className="max-w-lg w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
         <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">Apoya a tu Comunidad</h2>
 
-        {/* Paso 1 */}
         <div className="mt-8">
           <label htmlFor="activity" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             1. Elige una causa para tu donación
@@ -159,13 +185,11 @@ const DonationPage = () => {
           </select>
         </div>
 
-        {/* Paso 2 */}
         {selectedActivity && (
           <div className="mt-6">
             <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               2. Ingresa el valor a donar
             </label>
-
             <div className="relative">
               <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">$</span>
               <input
@@ -180,7 +204,6 @@ const DonationPage = () => {
           </div>
         )}
 
-        {/* Paso 3 */}
         {selectedActivity && amount && parseFloat(amount) > 0 && (
           <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
