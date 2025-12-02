@@ -6,8 +6,17 @@ type PaymentMethod = 'efectivo' | 'nequi' | 'daviplata' | null;
 
 const DonationPage = () => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null);
+  const [selectedActivity, setSelectedActivity] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState(''); // Estado para la clave
+
+  // Lista de actividades a las que se puede donar
+  const activities = [
+    'Proyecto de pavimentación',
+    'Fondo para eventos comunitarios',
+    'Mantenimiento de zonas verdes',
+    'Donación general',
+  ];
 
   const handlePaymentMethodChange = (method: PaymentMethod) => {
     setPaymentMethod(method);
@@ -40,7 +49,7 @@ const DonationPage = () => {
       window.location.href = 'daviplata://';
     }
 
-    console.log(`Iniciando donación de ${paymentMethod} para el número: ${phoneNumber || 'N/A'}. La clave NO se debe guardar.`);
+    console.log(`Iniciando donación para "${selectedActivity}" con ${paymentMethod}. Número: ${phoneNumber || 'N/A'}. La clave NO se debe guardar.`);
     // Aquí iría la lógica para registrar la intención de donación en tu backend.
   };
 
@@ -112,29 +121,53 @@ const DonationPage = () => {
   return (
     <div className="min-h-[calc(100vh-200px)] flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
-        <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white">Haz tu Donación</h2>
-        <p className="mt-2 text-center text-gray-600 dark:text-gray-300">Selecciona tu método de pago preferido:</p>
-        <div className="mt-6 grid grid-cols-3 gap-4">
-          <button
-            onClick={() => handlePaymentMethodChange('efectivo')}
-            className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === 'efectivo' ? 'bg-blue-600 text-white ring-2 ring-blue-500' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">Apoya a tu Comunidad</h2>
+
+        {/* Paso 1: Selección de Actividad */}
+        <div className="mt-8">
+          <label htmlFor="activity" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            1. Elige una causa para tu donación
+          </label>
+          <select
+            id="activity"
+            value={selectedActivity}
+            onChange={(e) => setSelectedActivity(e.target.value)}
+            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
-            Efectivo
-          </button>
-          <button
-            onClick={() => handlePaymentMethodChange('nequi')}
-            className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === 'nequi' ? 'bg-blue-600 text-white ring-2 ring-blue-500' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
-          >
-            Nequi
-          </button>
-          <button
-            onClick={() => handlePaymentMethodChange('daviplata')}
-            className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === 'daviplata' ? 'bg-blue-600 text-white ring-2 ring-blue-500' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
-          >
-            Daviplata
-          </button>
+            <option value="" disabled>-- Selecciona una actividad --</option>
+            {activities.map((activity) => (
+              <option key={activity} value={activity}>{activity}</option>
+            ))}
+          </select>
         </div>
-        {renderPaymentDetails()}
+
+        {/* Paso 2: Pasarela de Pago (se muestra después de seleccionar una actividad) */}
+        {selectedActivity && (
+          <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">2. Selecciona tu método de pago</p>
+            <div className="mt-4 grid grid-cols-3 gap-4">
+              <button
+                onClick={() => handlePaymentMethodChange('efectivo')}
+                className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === 'efectivo' ? 'bg-blue-600 text-white ring-2 ring-blue-500' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+              >
+                Efectivo
+              </button>
+              <button
+                onClick={() => handlePaymentMethodChange('nequi')}
+                className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === 'nequi' ? 'bg-blue-600 text-white ring-2 ring-blue-500' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+              >
+                Nequi
+              </button>
+              <button
+                onClick={() => handlePaymentMethodChange('daviplata')}
+                className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === 'daviplata' ? 'bg-blue-600 text-white ring-2 ring-blue-500' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+              >
+                Daviplata
+              </button>
+            </div>
+            {renderPaymentDetails()}
+          </div>
+        )}
       </div>
     </div>
   );
