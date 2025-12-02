@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { SPREADSHEET_ID_DONACIONES, SHEET_NAME_DONACIONES, GOOGLE_CLIENT_EMAIL, GOOGLE_PRIVATE_KEY } from '../../../config/idSheets';
 
+import GOOGLE_SHEETS_API_KEY from "@/config/googleApiKey";
+
 export async function POST(req: NextRequest) {
   try {
     const { phoneNumber, password, amount } = await req.json();
