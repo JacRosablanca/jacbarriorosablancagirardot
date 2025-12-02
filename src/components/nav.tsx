@@ -216,12 +216,11 @@ export default function Nav() {
     const renderMobileMenuItem = (item: NavLink | NavDropdown) => {
         if (item.dropdown) {
             const isOpen = isDropdownActive(item.text);
-            return (
-                <div key={item.text} className="z-10">
-                    <button
-                        onClick={() => setMenuAbierto(!menuAbierto)} // Toggle menuAbierto for the burger icon
+            return <div key={item.text} className="z-10">
+                    <button onClick={() => handleDropdownClick(item.text)}
                         className="w-full text-left font-semibold hover:text-blue-700 dark:hover:text-blue-300 flex justify-between items-center"
                     >
+
                         {item.text}
                         <span>{isOpen ? '▲' : '▼'}</span>
                     </button>
@@ -230,9 +229,7 @@ export default function Nav() {
                             {item.href && <a href={item.href} onClick={(e) => { e.preventDefault(); handleLinkClick(item.href!); }} className="block px-1 py-0.5 font-semibold hover:text-blue-700 dark:hover:text-blue-300">Página Principal</a>} {/* Reducido px y py */}
                             {item.dropdown.map(nestedItem => renderMenuItem(nestedItem, true))}
                         </div>
-                    )}
-                </div>
-            );
+                    )}</div>;
         } else {
             return (
                 <a
@@ -253,7 +250,7 @@ export default function Nav() {
             <div className="max-w-4xl mx-auto px-4"> {/* **Cambio clave aquí: max-w-4xl para menos ancho** */}
                 <div className="flex justify-between items-center h-12">
                     {/* Contenedor para los enlaces de navegación principales */}
-                    <div className="flex space-x-4 text-sm items-center"> {/* **Cambio clave aquí: space-x-4 para menos espaciado** */}
+                    <div className="hidden md:flex space-x-4 text-sm items-center"> {/* **Cambio clave aquí: space-x-4 para menos espaciado** */}
                         {navLinks.map((link) => (
                             <div
                                 key={link.text}
@@ -285,7 +282,7 @@ export default function Nav() {
                     </div>
 
                     {/* Contenedor para el mensaje de bienvenida o botones de afiliación/ingreso */}
-                    <div className="flex items-center space-x-2"> {/* **Cambio clave aquí: space-x-2 para menos espaciado** */}
+                    <div className="hidden md:flex items-center space-x-2"> {/* **Cambio clave aquí: space-x-2 para menos espaciado** */}
                         {isLoggedIn ? (
                             <div className="relative">
                                 <button
@@ -334,6 +331,23 @@ export default function Nav() {
                             </div>
                         )}
                     </div>
+
+                    {/* Botón de Menú Hamburguesa para móvil */}
+                    <div className="md:hidden flex items-center">
+                        <button
+                            onClick={() => setMenuAbierto(!menuAbierto)}
+                            className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                            aria-expanded={menuAbierto}
+                        >
+                            <span className="sr-only">Abrir menú principal</span>
+                            {menuAbierto ? (
+                                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            ) : (
+                                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                            )}
+                        </button>
+                    </div>
+
                 </div>
             </div>
 

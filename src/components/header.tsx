@@ -104,10 +104,10 @@ export default function Header() {
     : "Junta de Acción Comunal";
 
   return (
-    <header className="w-full bg-white dark:bg-[#23232a] shadow-md border-b border-gray-200 dark:border-gray-700">
+    <header className="w-full bg-white dark:bg-slate-800/50 shadow-sm border-b border-slate-200 dark:border-slate-700/50">
       {/* Barra superior */}
-      <div className="bg-gray-800 text-white text-xs flex justify-between px-4 py-1">
-        <span className="flex items-center gap-1"><MapPin size={14} /> {ciudad}</span>
+      <div className="bg-slate-800 dark:bg-slate-900 text-white text-xs flex justify-between px-4 py-1">
+        <span className="flex items-center gap-1 text-slate-300"><MapPin size={14} /> {ciudad}</span>
         <span className="flex items-center gap-1"><Clock size={14} /> {hora}</span>
       </div>
 
