@@ -7,6 +7,7 @@ type PaymentMethod = 'efectivo' | 'nequi' | 'daviplata' | null;
 const DonationPage = () => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null);
   const [selectedActivity, setSelectedActivity] = useState<string>('');
+  const [amount, setAmount] = useState<string>(''); // Estado para el monto
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState(''); // Estado para la clave
 
@@ -18,6 +19,11 @@ const DonationPage = () => {
     'Donación general',
   ];
 
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\D/g, ''); // Elimina todo lo que no sea un dígito
+    setAmount(rawValue);
+  };
+
   const handlePaymentMethodChange = (method: PaymentMethod) => {
     setPaymentMethod(method);
     setPhoneNumber(''); // Reset phone number when changing method
@@ -25,6 +31,11 @@ const DonationPage = () => {
   };
 
   const handleDonate = () => {
+    if (!amount || parseFloat(amount) <= 0) {
+      alert('Por favor, ingresa un monto válido para donar.');
+      return;
+    }
+
     if (!paymentMethod) {
       alert('Por favor, selecciona un método de pago.');
       return;
@@ -49,7 +60,7 @@ const DonationPage = () => {
       window.location.href = 'daviplata://';
     }
 
-    console.log(`Iniciando donación para "${selectedActivity}" con ${paymentMethod}. Número: ${phoneNumber || 'N/A'}. La clave NO se debe guardar.`);
+    console.log(`Iniciando donación de $${amount} para "${selectedActivity}" con ${paymentMethod}. Número: ${phoneNumber || 'N/A'}. La clave NO se debe guardar.`);
     // Aquí iría la lógica para registrar la intención de donación en tu backend.
   };
 
@@ -120,7 +131,7 @@ const DonationPage = () => {
 
   return (
     <div className="min-h-[calc(100vh-200px)] flex items-center justify-center py-12 px-4">
-      <div className="max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
+      <div className="max-w-lg w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
         <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">Apoya a tu Comunidad</h2>
 
         {/* Paso 1: Selección de Actividad */}
@@ -141,10 +152,30 @@ const DonationPage = () => {
           </select>
         </div>
 
-        {/* Paso 2: Pasarela de Pago (se muestra después de seleccionar una actividad) */}
+        {/* Paso 2: Monto a Donar (se muestra después de seleccionar una actividad) */}
         {selectedActivity && (
+          <div className="mt-6">
+            <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              2. Ingresa el valor a donar
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">$</span>
+              <input
+                type="text"
+                id="amount"
+                value={amount === '' ? '' : new Intl.NumberFormat('es-CO').format(Number(amount))}
+                onChange={handleAmountChange}
+                className="pl-7 mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="50000"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Paso 3: Pasarela de Pago (se muestra después de seleccionar actividad y monto) */}
+        {selectedActivity && amount && parseFloat(amount) > 0 && (
           <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">2. Selecciona tu método de pago</p>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">3. Selecciona tu método de pago</p>
             <div className="mt-4 grid grid-cols-3 gap-4">
               <button
                 onClick={() => handlePaymentMethodChange('efectivo')}
