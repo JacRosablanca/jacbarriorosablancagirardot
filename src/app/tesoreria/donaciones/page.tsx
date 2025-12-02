@@ -7,10 +7,12 @@ type PaymentMethod = 'efectivo' | 'nequi' | 'daviplata' | null;
 const DonationPage = () => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [password, setPassword] = useState(''); // Estado para la clave
 
   const handlePaymentMethodChange = (method: PaymentMethod) => {
     setPaymentMethod(method);
     setPhoneNumber(''); // Reset phone number when changing method
+    setPassword(''); // Reset password when changing method
   };
 
   const handleDonate = () => {
@@ -24,6 +26,11 @@ const DonationPage = () => {
       return;
     }
 
+    if ((paymentMethod === 'nequi' || paymentMethod === 'daviplata') && !password) {
+      alert('Por favor, ingresa tu clave.');
+      return;
+    }
+
     // Redirección a la app correspondiente usando deep links
     if (paymentMethod === 'nequi') {
       // Esto intentará abrir la aplicación Nequi en el dispositivo del usuario.
@@ -33,7 +40,7 @@ const DonationPage = () => {
       window.location.href = 'daviplata://';
     }
 
-    console.log(`Iniciando donación de ${paymentMethod} para el número: ${phoneNumber || 'N/A'}`);
+    console.log(`Iniciando donación de ${paymentMethod} para el número: ${phoneNumber || 'N/A'}. La clave NO se debe guardar.`);
     // Aquí iría la lógica para registrar la intención de donación en tu backend.
   };
 
@@ -54,11 +61,15 @@ const DonationPage = () => {
         return (
           <div className="mt-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
             <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-100">
-              Completa tu donación por {paymentMethod === 'nequi' ? 'Nequi' : 'Daviplata'}
+              Donar con {paymentMethod === 'nequi' ? 'Nequi' : 'Daviplata'}
             </h3>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Ingresa tu número de celular. Al continuar, te redirigiremos a la aplicación para que puedas completar el pago de forma segura.
-            </p>
+            <div className="mt-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 rounded-lg">
+              <p className="text-sm text-red-800 dark:text-red-200">
+                <span className="font-bold">Advertencia de Seguridad:</span> Nunca compartas tu clave. Un sitio web legítimo nunca te la pedirá.
+                Al continuar, serás redirigido a la app oficial para completar el pago de forma segura.
+              </p>
+            </div>
+
             <div className="mt-4">
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Número de celular
@@ -70,6 +81,19 @@ const DonationPage = () => {
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="3001234567"
+              />
+            </div>
+            <div className="mt-4">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Clave de ingreso
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="••••"
               />
             </div>
             <button
