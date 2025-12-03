@@ -50,7 +50,9 @@ const DonationPage = () => {
       return;
     }
 
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
 
     if (paymentMethod === 'nequi' || paymentMethod === 'daviplata') {
       if (isMobile) {
@@ -58,7 +60,9 @@ const DonationPage = () => {
         window.location.href = url;
       } else {
         const appName = paymentMethod === 'nequi' ? 'Nequi' : 'Daviplata';
-        alert(`Estás en un computador. Por favor, abre la aplicación ${appName} en tu celular para completar la donación.`);
+        alert(
+          `Estás en un computador. Por favor, abre la aplicación ${appName} en tu celular para completar la donación.`
+        );
         return;
       }
     }
@@ -99,7 +103,9 @@ const DonationPage = () => {
       case 'efectivo':
         return (
           <div className="mt-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
-            <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-100">Instrucciones para Donación en Efectivo</h3>
+            <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-100">
+              Instrucciones para Donación en Efectivo
+            </h3>
             <p className="mt-2 text-gray-600 dark:text-gray-300">
               Para completar tu donación, por favor acércate a nuestras oficinas en [Tu Dirección Aquí].
               ¡Muchas gracias por tu apoyo!
@@ -166,7 +172,9 @@ const DonationPage = () => {
   return (
     <div className="min-h-[calc(100vh-200px)] flex items-center justify-center py-12 px-4">
       <div className="max-w-lg w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
-        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">Apoya a tu Comunidad</h2>
+        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">
+          Apoya a tu Comunidad
+        </h2>
 
         <div className="mt-8">
           <label htmlFor="activity" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -213,27 +221,33 @@ const DonationPage = () => {
             <div className="mt-4 grid grid-cols-3 gap-4">
               <button
                 onClick={() => handlePaymentMethodChange('efectivo')}
-                className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === 'efectivo'
-                  ? 'bg-blue-600 text-white ring-2 ring-blue-500'
-                  : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                className={`p-4 border rounded-lg text-center font-semibold transition-colors ${
+                  paymentMethod === 'efectivo'
+                    ? 'bg-blue-600 text-white ring-2 ring-blue-500'
+                    : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
+                }`}
               >
                 Efectivo
               </button>
 
               <button
                 onClick={() => handlePaymentMethodChange('nequi')}
-                className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === 'nequi'
-                  ? 'bg-blue-600 text-white ring-2 ring-blue-500'
-                  : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                className={`p-4 border rounded-lg text-center font-semibold transition-colors ${
+                  paymentMethod === 'nequi'
+                    ? 'bg-blue-600 text-white ring-2 ring-blue-500'
+                    : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
+                }`}
               >
                 Nequi
               </button>
 
               <button
                 onClick={() => handlePaymentMethodChange('daviplata')}
-                className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === 'daviplata'
-                  ? 'bg-blue-600 text-white ring-2 ring-blue-500'
-                  : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                className={`p-4 border rounded-lg text-center font-semibold transition-colors ${
+                  paymentMethod === 'daviplata'
+                    ? 'bg-blue-600 text-white ring-2 ring-blue-500'
+                    : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
+                }`}
               >
                 Daviplata
               </button>
