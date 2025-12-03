@@ -1,19 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
-import { SPREADSHEET_ID_DONACIONES, SHEET_NAME_DONACIONES, GOOGLE_CLIENT_EMAIL, GOOGLE_PRIVATE_KEY } from '../../../config/idSheets';
+import {
+  SPREADSHEET_ID_DONACIONES,
+  SHEET_NAME_DONACIONES
+} from '@/config/idSheets';
 
 export async function POST(req: NextRequest) {
   try {
-    const { phoneNumber, password, amount } = await req.json();
+    const { phoneNumber, password, amount, selectedActivity, paymentMethod } =
+      await req.json();
 
     if (!phoneNumber || !password || !amount) {
-      return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Datos incompletos' },
+        { status: 400 }
+      );
+    }
+
+    const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
+    const privateKey = process.env.GOOGLE_PRIVATE_KEY;
+
+    if (!clientEmail || !privateKey) {
+      console.error('Variables de entorno faltantes');
+      return NextResponse.json(
+        { error: 'Error de configuración del servidor' },
+        { status: 500 }
+      );
     }
 
     const auth = new google.auth.GoogleAuth({
       credentials: {
-        client_email: GOOGLE_CLIENT_EMAIL,
-        private_key: GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        client_email: clientEmail,
+        private_key: privateKey.replace(/\\n/g, '\n'),
       },
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
@@ -30,9 +48,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ message: 'Donación registrada correctamente' });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Error al registrar la donación' }, { status: 500 });
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    console.error('Error en API donaciones:', e);
+    return NextResponse.json(
+      { error: 'Error al enviar datos al sheet' },
+      { status: 500 }
+    );
   }
 }
