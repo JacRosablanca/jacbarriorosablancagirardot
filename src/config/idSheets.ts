@@ -70,3 +70,6 @@ export const SHEET_NAME_PATROCINADORES = 'Patrocinadores'; // Asegúrate de que 
 export const SPREADSHEET_ID_NOSOTROS = '1omG7qCrgcL7uSb7-2hbK7218f4wxQalxD8daKZRyHv0';
 export const SHEET_NAME_NOSOTROS = 'Sobre Nosotros'; // Asegúrate de que este sea el nombre correcto de tu pestaña
 
+
+
+
