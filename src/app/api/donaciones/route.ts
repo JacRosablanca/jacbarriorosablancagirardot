@@ -3,7 +3,7 @@ import { google } from "googleapis";
 import {
   GOOGLE_CLIENT_EMAIL,
   GOOGLE_PRIVATE_KEY,
-  SPREADSHEET_ID,
+  SPREADSHEET_ID_DONACIONES,
 } from "@/config/idSheets";
 
 export async function POST(req: Request) {
@@ -25,8 +25,8 @@ export async function POST(req: Request) {
     });
 
     await sheets.spreadsheets.values.append({
-      spreadsheetId: SPREADSHEET_ID,
-      range: "Hoja1!A1",
+      spreadsheetId: SPREADSHEET_ID_DONACIONES,
+      range: "Hoja1!F1",
       valueInputOption: "RAW",
       requestBody: {
         values: [
