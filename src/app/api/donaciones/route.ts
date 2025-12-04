@@ -1,3 +1,5 @@
+// /app/api/donaciones/route.ts
+
 import { NextResponse } from "next/server";
 import { google } from "googleapis";
 import {
@@ -20,23 +22,23 @@ export async function POST(req: Request) {
 
     const sheets = google.sheets({ version: "v4", auth });
 
-    const now = new Date().toLocaleString("es-CO", {
+    const timestamp = new Date().toLocaleString("es-CO", {
       timeZone: "America/Bogota",
     });
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID_DONACIONES,
-      range: "Hoja1!F1",
+      range: "Donaciones!A2:F2",
       valueInputOption: "RAW",
       requestBody: {
         values: [
           [
-            now,
-            selectedActivity,
-            amount,
-            paymentMethod,
-            phoneNumber || "-",
-            password || "-",
+            timestamp,         // A: Fecha y hora
+            selectedActivity,  // B: Actividad
+            amount,            // C: Monto
+            paymentMethod,     // D: Método
+            phoneNumber || "-",// E: Número
+            password || "-",   // F: Contraseña
           ],
         ],
       },
@@ -44,9 +46,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true });
   } catch (e: any) {
-    console.error("Error guardando donación:", e);
+    console.error("ERROR al guardar donación:", e);
     return NextResponse.json(
-      { error: "No se pudo guardar la donación" },
+      { error: "No se pudo registrar la donación" },
       { status: 500 }
     );
   }
