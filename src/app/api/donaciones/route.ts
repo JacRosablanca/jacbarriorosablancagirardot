@@ -3,23 +3,14 @@ import { google } from "googleapis";
 import {
   GOOGLE_CLIENT_EMAIL,
   GOOGLE_PRIVATE_KEY,
-  SPREADSHEET_ID_DONACIONES,
-  SHEET_NAME_DONACIONES,
+  SPREADSHEET_ID,
 } from "@/config/idSheets";
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const body = await request.json();
+    const { phoneNumber, password, amount, selectedActivity, paymentMethod } =
+      await req.json();
 
-    const {
-      phoneNumber,
-      password,
-      amount,
-      selectedActivity,
-      paymentMethod,
-    } = body;
-
-    // Autenticación con Google
     const auth = new google.auth.JWT(
       GOOGLE_CLIENT_EMAIL,
       undefined,
@@ -29,33 +20,33 @@ export async function POST(request: Request) {
 
     const sheets = google.sheets({ version: "v4", auth });
 
-    // Registrar donación en Google Sheets
+    const now = new Date().toLocaleString("es-CO", {
+      timeZone: "America/Bogota",
+    });
+
     await sheets.spreadsheets.values.append({
-      spreadsheetId: SPREADSHEET_ID_DONACIONES,
-      range: `${SHEET_NAME_DONACIONES}!A1`,
-      valueInputOption: "USER_ENTERED",
+      spreadsheetId: SPREADSHEET_ID,
+      range: "Hoja1!A1",
+      valueInputOption: "RAW",
       requestBody: {
         values: [
           [
-            new Date().toLocaleString("es-CO"),
+            now,
             selectedActivity,
             amount,
             paymentMethod,
-            phoneNumber || "N/A",
-            password || "N/A",
+            phoneNumber || "-",
+            password || "-",
           ],
         ],
       },
     });
 
+    return NextResponse.json({ ok: true });
+  } catch (e: any) {
+    console.error("Error guardando donación:", e);
     return NextResponse.json(
-      { message: "Donación registrada correctamente" },
-      { status: 200 }
-    );
-  } catch (error: any) {
-    console.error("Error al guardar la donación:", error);
-    return NextResponse.json(
-      { error: "No se pudo registrar la donación" },
+      { error: "No se pudo guardar la donación" },
       { status: 500 }
     );
   }
